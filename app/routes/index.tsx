@@ -6,22 +6,39 @@ export let loader = async ({ request }) => {
   const url = new URL(request.url);
   const search = url.searchParams.get("search");
   
-  const politicians = [
+  const politiciansDB = [
+    {
+      "name": "Silvio Berlusconi",
+      "socialUrl": "https://twitter.com/berlusconi",
+      "points": [
         {
-          "name": "Silvio Berlusconi",
-          "socialUrl": "https://twitter.com/berlusconi",
-          "points": [
-            {
-              "score": 500,
-              "pointUrl": "https://twitter.com/berlusconi/status/1492531946286628864",
-              "date": "2022-02-12"
-            }
-          ]
+          "score": 500,
+          "pointUrl": "https://twitter.com/berlusconi/status/1492531946286628864",
+          "date": "2022-02-12",
+          "title": "Ex presidente del consiglio che va a vedere la partita della sua squadra portandogli fortuna"
         }
       ]
-    
+    },
+    {
+      "name": "Giuseppe Conte",
+      "socialUrl": "https://twitter.com/berlusconi",
+      "points": [
+        {
+          "score": 500,
+          "pointUrl": "https://twitter.com/berlusconi/status/1492531946286628864",
+          "date": "2022-02-12",
+          "title": "Ex presidente del consiglio che va a vedere la partita della sua squadra portandogli fortuna"
+        }
+      ]
+    }
+  ]
+  
   
   // return json({ politicians });
+  
+  const politicians = search
+    ? politiciansDB.filter(({name}) => name.toLowerCase().includes(search.toLowerCase()))
+    : politiciansDB
   
   return new Response(JSON.stringify({ politicians, search }), {
     headers: {
@@ -31,16 +48,25 @@ export let loader = async ({ request }) => {
 };
 
 export default function Index() {
-  const {politicians, search: query} = useLoaderData();
-  const [search, setSearch] = useState('')
+  const {politicians, search} = useLoaderData();
+  const [searchState, setSearchState] = useState(search)
   
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix: {query}</h1>
-      <input placeholder="search..." onChange={(e) => setSearch(e.target.value)} />
-      <button><a href={`?search=${search}`}>Search</a></button>
+      <h1>Fantacitorio</h1>
+      <form method="get">
+        <input
+          name="search"
+          placeholder="search..."
+          value={searchState}
+          onChange={(e) => setSearchState(e.target.value)}
+          required
+        />
+        <button type="submit">cerca politico</button>
+        <a href="?">reset</a>
+      </form>
       <ul>
-        {politicians.map(({name, socialUrl}) => (
+        {politicians.map(({name, socialUrl, points}) => (
           <li>
             <a
               target="_blank"
@@ -49,6 +75,11 @@ export default function Index() {
             >
               {name}
             </a>
+            <ul>
+              {points.map(({score, pointUrl, date, title}) => (
+                <li>{date} - {score} punti <a href={pointUrl}>{title}</a></li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
