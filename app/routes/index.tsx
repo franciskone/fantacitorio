@@ -1,6 +1,11 @@
-import {useLoaderData, json} from "remix";
+import {useLoaderData } from "@remix-run/react";
+import {useState} from "react";
+// import { json } from "remix";
 
-export let loader = async () => {
+export let loader = async ({ request }) => {
+  const url = new URL(request.url);
+  const search = url.searchParams.get("search");
+  
   const politicians = [
         {
           "name": "Silvio Berlusconi",
@@ -16,17 +21,26 @@ export let loader = async () => {
       ]
     
   
-  return json({ politicians });
+  // return json({ politicians });
+  
+  return new Response(JSON.stringify({ politicians, search }), {
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  });
 };
 
 export default function Index() {
-  let data = useLoaderData();
+  const {politicians, search: query} = useLoaderData();
+  const [search, setSearch] = useState('')
   
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
+      <h1>Welcome to Remix: {query}</h1>
+      <input placeholder="search..." onChange={(e) => setSearch(e.target.value)} />
+      <button><a href={`?search=${search}`}>Search</a></button>
       <ul>
-        {data.politicians.map(({name, socialUrl}) => (
+        {politicians.map(({name, socialUrl}) => (
           <li>
             <a
               target="_blank"
