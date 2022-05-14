@@ -55,7 +55,7 @@ export default function Index() {
 			<h1>Fantacitorio</h1>
 			<form method="get">
 				<input name="search" placeholder="search..." required value={search} />
-				<button type="submit">cerca politico</button>
+				<button type="submit">cerca politico:</button>
 				<a href="?">reset</a>
 			</form>
 			<ul>
